@@ -3,12 +3,13 @@ package fze
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 )
 
 func Runner(args []string) (string, error) {
-	// out, err := exec.Command(args[0], args[1]).Output()
 	fmt.Printf("args: %v\n", args)
-	out, err := exec.Command(args[0], args[1:]...).Output()
+	argString := strings.Join(args, " ")
+	out, err := exec.Command("bash", "-c", argString).Output()
 	if err != nil {
 		return "", fmt.Errorf("running command %v: %v", args, err)
 	}
