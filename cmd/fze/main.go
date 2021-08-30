@@ -1,21 +1,21 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"fze"
-	"log"
 	"os"
 )
 
 func main() {
 	args := os.Args[1:]
+	var multi bool
 
-	var runnerOpts fze.RunnerOptions
-	if args[0] == "-m" || args[0] == "--multi" {
-		args = args[1:]
-		runnerOpts.Multi = true
-	}
-	log.Printf("args: %v", args)
+	flag.BoolVar(&multi, "multi", false, "Run FZF in multi mode")
+	flag.Parse()
+	runnerOpts := fze.RunnerOptions{Multi: multi}
+	// Everything else is an arg
+	args = args[flag.NFlag():]
 
 	err := fze.Runner(args, runnerOpts)
 	if err != nil {
