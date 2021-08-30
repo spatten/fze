@@ -30,5 +30,5 @@ func rgRunner(args []string) error {
 	lineNumber := output[1]
 
 	// Run emacsclient
-	return openEditorWithLineNumber(path, lineNumber)
+	return openEditor(openEditorArgs{path: path, lineNumber: lineNumber})
 }

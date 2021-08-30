@@ -98,7 +98,7 @@ func gitDiffOrShowOutput(res []byte, isStatus bool) error {
 	if isStatus {
 		path := strings.TrimSpace(strings.Split(out, "|")[0])
 
-		err = openEditorWithoutLineNumber(path)
+		err = openEditor(openEditorArgs{path: path})
 		if err != nil {
 			return fmt.Errorf("running emacsclient for git with --stat: %v", err)
 		}
@@ -115,7 +115,7 @@ func gitDiffOrShowOutput(res []byte, isStatus bool) error {
 	lineNumber := output[1]
 
 	// Run emacsclient
-	err = openEditorWithLineNumber(path, lineNumber)
+	err = openEditor(openEditorArgs{path: path, lineNumber: lineNumber})
 	if err != nil {
 		return fmt.Errorf("running emacsclient: %v", err)
 	}

@@ -30,18 +30,13 @@ func Runner(args []string) error {
 	return fmt.Errorf("command %s not recognized", args[0])
 }
 
-func openEditorWithLineNumber(path string, lineNumber string) error {
-	lineNumberArg := fmt.Sprintf("+%s", lineNumber)
-	return openEditor([]string{lineNumberArg, path})
-}
-
-func openEditorWithoutLineNumber(path string) error {
-	return openEditor([]string{path})
-}
-
-func openEditor(pathArgs []string) error {
-	args := append([]string{"-n", "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON")}, pathArgs...)
-	ec := exec.Command("emacsclient", args...)
+func openEditor(args openEditorArgs) error {
+	pathArgs := []string{args.path}
+	if args.lineNumber != "" {
+		pathArgs = append(pathArgs, fmt.Sprintf("+%s", args.lineNumber))
+	}
+	cmdArgs := append([]string{"-n", "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON")}, pathArgs...)
+	ec := exec.Command("emacsclient", cmdArgs...)
 	err := ec.Run()
 
 	if err != nil {

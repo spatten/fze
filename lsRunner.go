@@ -34,5 +34,5 @@ func lsRunner(args []string) error {
 	}
 
 	// Run emacsclient
-	return openEditorWithoutLineNumber(path)
+	return openEditor(openEditorArgs{path: path})
 }
