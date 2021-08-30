@@ -39,6 +39,13 @@ func openEditor(pathArgs []string) error {
 	if err != nil {
 		return fmt.Errorf("running emacsclient with args: %v, %g", pathArgs, err)
 	}
+
+	tmux := exec.Command("tmux", "select-pane", "-U")
+	err = tmux.Run()
+	if err != nil {
+		return fmt.Errorf("switching tmux pane: %v", err)
+	}
+
 	return nil
 }
 
