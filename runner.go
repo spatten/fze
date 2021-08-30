@@ -59,8 +59,8 @@ func findRunner(args []string) (string, error) {
 	}
 
 	path := strings.TrimSpace(out.String())
-	fmt.Printf("running emacsclient on file %v", path)
-	ec := exec.Command("emacsclient", "-n", "-s", "session3-window6", path)
+	fmt.Printf("running emacsclient on file %v\n", path)
+	ec := exec.Command("emacsclient", "-n", "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON"), path)
 	err = ec.Run()
 
 	if err != nil {
