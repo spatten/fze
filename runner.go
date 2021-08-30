@@ -22,6 +22,10 @@ func Runner(args []string) error {
 		return rgRunner(args[1:])
 	case "git":
 		return gitRunner(args[1:])
+	case "gd": // alias for "git diff"
+		return gitRunner(append([]string{"diff"}, args[1:]...))
+	case "st": // alias for "git status"
+		return gitRunner(append([]string{"status"}, args[1:]...))
 	}
 	return fmt.Errorf("command %s not recognized", args[0])
 }
