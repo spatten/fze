@@ -1,7 +1,7 @@
 package fze
 
-type runnerOptions struct {
-	multi bool
+type RunnerOptions struct {
+	Multi bool
 }
 
 type pathArg struct {

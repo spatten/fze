@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func lsRunner(args []string, opts runnerOptions) error {
+func lsRunner(args []string, opts RunnerOptions) error {
 	isLong := false
 	if len(args) > 0 && args[0] == "-l" {
 		isLong = true

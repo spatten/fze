@@ -9,15 +9,9 @@ import (
 	"strings"
 )
 
-func Runner(args []string) error {
+func Runner(args []string, runnerOpts RunnerOptions) error {
 	if len(args) < 1 {
 		return fmt.Errorf("no args provided")
-	}
-
-	var runnerOpts runnerOptions
-	if args[0] == "-m" || args[0] == "--multi" {
-		args = args[1:]
-		runnerOpts = runnerOptions{multi: true}
 	}
 
 	switch cmd := args[0]; cmd {
@@ -37,7 +31,7 @@ func Runner(args []string) error {
 	return fmt.Errorf("command %s not recognized", args[0])
 }
 
-func openEditor(paths []pathArg, runnerOpts runnerOptions) error {
+func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
 	var pathArgs []string
 
 	// TODO: validate that no paths have a line-number or all paths have a line-number
@@ -51,7 +45,7 @@ func openEditor(paths []pathArg, runnerOpts runnerOptions) error {
 	log.Printf("paths: %v (len = %d)\n", paths, len(paths))
 	log.Printf("pathArgs: %v (len = %d)\n", pathArgs, len(pathArgs))
 	var cmdArgs []string
-	if !runnerOpts.multi {
+	if !runnerOpts.Multi {
 		cmdArgs = []string{"-n"}
 	}
 	cmdArgs = append(cmdArgs, "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON"))
@@ -72,9 +66,9 @@ func openEditor(paths []pathArg, runnerOpts runnerOptions) error {
 	return nil
 }
 
-func runFzf(input []byte, opts runnerOptions) ([]string, error) {
+func runFzf(input []byte, opts RunnerOptions) ([]string, error) {
 	fzfArgs := []string{"--ansi", "--tac"}
-	if opts.multi {
+	if opts.Multi {
 		fzfArgs = append(fzfArgs, "--multi")
 	}
 	fzf := exec.Command("fzf", fzfArgs...)

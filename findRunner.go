@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func findRunner(args []string, opts runnerOptions) error {
+func findRunner(args []string, opts RunnerOptions) error {
 	// Get the output from find
 	cmd := "find " + strings.Join(args, " ") // + " | fzf | xargs -n 1 emacsclient -n -s $FZE_EMACS_SERVER"
 	fmt.Printf("Running cmd: %s\n", cmd)

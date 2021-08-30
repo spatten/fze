@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func gitRunner(args []string, opts runnerOptions) error {
+func gitRunner(args []string, opts RunnerOptions) error {
 	if len(args) < 1 {
 		return fmt.Errorf("no args to git")
 	}
@@ -23,7 +23,7 @@ func gitRunner(args []string, opts runnerOptions) error {
 	return fmt.Errorf("only git diff and git show are supported")
 }
 
-func gitDiffRunner(args []string, opts runnerOptions) error {
+func gitDiffRunner(args []string, opts RunnerOptions) error {
 	// Get the output from git
 	args, isStatus := mangleGitArgs(args)
 	var cmd string
@@ -41,7 +41,7 @@ func gitDiffRunner(args []string, opts runnerOptions) error {
 	return gitDiffOrShowOutput(res, isStatus, opts)
 }
 
-func gitShowRunner(args []string, opts runnerOptions) error {
+func gitShowRunner(args []string, opts RunnerOptions) error {
 	// Get the output from git
 	args, isStatus := mangleGitArgs(args)
 	var cmd string
@@ -60,7 +60,7 @@ func gitShowRunner(args []string, opts runnerOptions) error {
 }
 
 // replace "git status" with "git diff --stat"
-func gitStatusRunner(args []string, opts runnerOptions) error {
+func gitStatusRunner(args []string, opts RunnerOptions) error {
 	args = append([]string{"--stat"}, args...)
 	return gitDiffRunner(args, opts)
 }
@@ -79,7 +79,7 @@ func mangleGitArgs(args []string) ([]string, bool) {
 	return newArgs, isStatus
 }
 
-func gitDiffOrShowOutput(res []byte, isStatus bool, opts runnerOptions) error {
+func gitDiffOrShowOutput(res []byte, isStatus bool, opts RunnerOptions) error {
 	// Run the output from git through fzf
 	outLines, err := runFzf(res, opts)
 	if err != nil {

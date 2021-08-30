@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func rgRunner(args []string, opts runnerOptions) error {
+func rgRunner(args []string, opts RunnerOptions) error {
 	// Get the output from rg
 	cmd := "rg -n " + strings.Join(args, " ") // + " | fzf | xargs -n 1 emacsclient -n -s $TMUX_EMACS_DAEMON"
 	fmt.Printf("Running cmd: %s\n", cmd)
