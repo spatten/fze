@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 )
 
@@ -19,99 +18,6 @@ func Runner(args []string) (string, error) {
 		return rgRunner(args[1:])
 	}
 	return "", fmt.Errorf("command %s not recognized", args[0])
-}
-
-func lsRunner(args []string) (string, error) {
-	isLong := false
-	if len(args) > 0 && args[0] == "-l" {
-		isLong = true
-	}
-
-	cmd := "ls " + strings.Join(args, " ")
-	res, err := exec.Command("bash", "-c", cmd).Output()
-	if err != nil {
-		return "", err
-	}
-
-	// Run the output from ls through fzf
-	path, err := runFzf(res)
-	if err != nil {
-		return "", fmt.Errorf("runFzf: %v", err)
-	}
-
-	if isLong {
-		re := regexp.MustCompile(" +")
-		// ls -l output has a variable number of spaces between args. Clean this up by replacing multiple spaces with one space
-		path = re.ReplaceAllString(path, " ")
-		// take 9th column onwards as the path
-		path = strings.SplitAfterN(path, " ", 9)[8]
-		fmt.Printf("path arg: %s\n", path)
-	}
-
-	// Run emacsclient
-	err = openEditorWithoutLineNumber(path)
-	if err != nil {
-		return "", fmt.Errorf("running emacsclient: %v", err)
-	}
-
-	return "", nil
-
-}
-
-func findRunner(args []string) (string, error) {
-	// Get the output from find
-	cmd := "find " + strings.Join(args, " ") // + " | fzf | xargs -n 1 emacsclient -n -s $TMUX_EMACS_DAEMON"
-	fmt.Printf("Running cmd: %s\n", cmd)
-	res, err := exec.Command("bash", "-c", cmd).Output()
-	if err != nil {
-		return "", fmt.Errorf("running find: %v", err)
-	}
-
-	// Run the output from find through fzf
-	path, err := runFzf(res)
-	if err != nil {
-		return "", fmt.Errorf("runFzf: %v", err)
-	}
-
-	// Run emacsclient
-	err = openEditorWithoutLineNumber(path)
-	if err != nil {
-		return "", fmt.Errorf("running emacsclient: %v", err)
-	}
-
-	return "", nil
-}
-
-func rgRunner(args []string) (string, error) {
-	// Get the output from rg
-	cmd := "rg -n " + strings.Join(args, " ") // + " | fzf | xargs -n 1 emacsclient -n -s $TMUX_EMACS_DAEMON"
-	fmt.Printf("Running cmd: %s\n", cmd)
-	res, err := exec.Command("bash", "-c", cmd).Output()
-	if err != nil {
-		return "", fmt.Errorf("running rg: %v", err)
-	}
-
-	// Run the output from rg through fzf
-	out, err := runFzf(res)
-	if err != nil {
-		return "", fmt.Errorf("runFzf: %v", err)
-	}
-
-	// Get the filename and linenumber from the output
-	output := strings.Split(out, ":")
-	if len(output) < 2 {
-		return "", fmt.Errorf("expecting a path and a line-number in this rg output: %s", output)
-	}
-	path := output[0]
-	lineNumber := output[1]
-
-	// Run emacsclient
-	err = openEditorWithLineNumber(path, lineNumber)
-	if err != nil {
-		return "", fmt.Errorf("running emacsclient: %v", err)
-	}
-
-	return "", nil
 }
 
 func openEditorWithLineNumber(path string, lineNumber string) error {
