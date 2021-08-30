@@ -53,11 +53,9 @@ func lsRunner(args []string) (string, error) {
 		path = strings.SplitAfterN(path, " ", 9)[8]
 		fmt.Printf("path arg: %s\n", path)
 	}
-	// Run emacsclient
-	fmt.Printf("running emacsclient on file %v\n", path)
-	ec := exec.Command("emacsclient", "-n", "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON"), path)
-	err = ec.Run()
 
+	// Run emacsclient
+	err = openEditorWithoutLineNumber(path)
 	if err != nil {
 		return "", fmt.Errorf("running emacsclient: %v", err)
 	}
@@ -82,10 +80,7 @@ func findRunner(args []string) (string, error) {
 	}
 
 	// Run emacsclient
-	fmt.Printf("running emacsclient on file %v\n", path)
-	ec := exec.Command("emacsclient", "-n", "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON"), path)
-	err = ec.Run()
-
+	err = openEditorWithoutLineNumber(path)
 	if err != nil {
 		return "", fmt.Errorf("running emacsclient: %v", err)
 	}
@@ -117,16 +112,32 @@ func rgRunner(args []string) (string, error) {
 	lineNumber := output[1]
 
 	// Run emacsclient
-
-	fmt.Printf("running emacsclient on file %v\n", path)
-	ec := exec.Command("emacsclient", "-n", "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON"), "+"+lineNumber, path)
-	err = ec.Run()
-
+	err = openEditorWithLineNumber(path, lineNumber)
 	if err != nil {
-		return "", fmt.Errorf("running emacsclient with lineNumber = %s and path = %s: %v", lineNumber, path, err)
+		return "", fmt.Errorf("running emacsclient: %v", err)
 	}
 
 	return "", nil
+}
+
+func openEditorWithLineNumber(path string, lineNumber string) error {
+	lineNumberArg := fmt.Sprintf("+%s", lineNumber)
+	return openEditor([]string{lineNumberArg, path})
+}
+
+func openEditorWithoutLineNumber(path string) error {
+	return openEditor([]string{path})
+}
+
+func openEditor(pathArgs []string) error {
+	args := append([]string{"-n", "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON")}, pathArgs...)
+	ec := exec.Command("emacsclient", args...)
+	err := ec.Run()
+
+	if err != nil {
+		return fmt.Errorf("running emacsclient with args: %v, %g", pathArgs, err)
+	}
+	return nil
 }
 
 func runFzf(input []byte) (string, error) {
