@@ -1,14 +1,10 @@
 package fze
 
 type runnerOptions struct {
-	fzfOptions fzfOptions
-}
-
-type fzfOptions struct {
 	multi bool
 }
 
-type openEditorArgs struct {
+type pathArg struct {
 	path       string
 	lineNumber string
 }

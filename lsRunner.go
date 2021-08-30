@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func lsRunner(args []string) error {
+func lsRunner(args []string, opts runnerOptions) error {
 	isLong := false
 	if len(args) > 0 && args[0] == "-l" {
 		isLong = true
@@ -20,19 +20,26 @@ func lsRunner(args []string) error {
 	}
 
 	// Run the output from ls through fzf
-	path, err := runFzf(res)
+	outLines, err := runFzf(res, opts)
 	if err != nil {
 		return fmt.Errorf("runFzf: %v", err)
 	}
 
-	if isLong {
-		re := regexp.MustCompile(" +")
-		// ls -l output has a variable number of spaces between args. Clean this up by replacing multiple spaces with one space
-		path = re.ReplaceAllString(path, " ")
-		// take 9th column onwards as the path
-		path = strings.SplitN(path, " ", 9)[8]
+	var paths []pathArg
+	for _, line := range outLines {
+		var path string
+		if isLong {
+			re := regexp.MustCompile(" +")
+			// ls -l output has a variable number of spaces between args. Clean this up by replacing multiple spaces with one space
+			path = re.ReplaceAllString(line, " ")
+			// take 9th column onwards as the path
+			path = strings.SplitN(path, " ", 9)[8]
+		} else {
+			path = line
+		}
+		paths = append(paths, pathArg{path: path})
 	}
 
 	// Run emacsclient
-	return openEditor(openEditorArgs{path: path})
+	return openEditor(paths, opts)
 }

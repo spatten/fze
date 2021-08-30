@@ -6,24 +6,24 @@ import (
 	"strings"
 )
 
-func gitRunner(args []string) error {
+func gitRunner(args []string, opts runnerOptions) error {
 	if len(args) < 1 {
 		return fmt.Errorf("no args to git")
 	}
 
 	switch arg := args[0]; arg {
 	case "diff":
-		return gitDiffRunner(args[1:])
+		return gitDiffRunner(args[1:], opts)
 	case "show":
-		return gitShowRunner(args[1:])
+		return gitShowRunner(args[1:], opts)
 	case "status":
-		return gitStatusRunner(args[1:])
+		return gitStatusRunner(args[1:], opts)
 	}
 
 	return fmt.Errorf("only git diff and git show are supported")
 }
 
-func gitDiffRunner(args []string) error {
+func gitDiffRunner(args []string, opts runnerOptions) error {
 	// Get the output from git
 	args, isStatus := mangleGitArgs(args)
 	var cmd string
@@ -38,10 +38,10 @@ func gitDiffRunner(args []string) error {
 		return fmt.Errorf("running git: %v", err)
 	}
 
-	return gitDiffOrShowOutput(res, isStatus)
+	return gitDiffOrShowOutput(res, isStatus, opts)
 }
 
-func gitShowRunner(args []string) error {
+func gitShowRunner(args []string, opts runnerOptions) error {
 	// Get the output from git
 	args, isStatus := mangleGitArgs(args)
 	var cmd string
@@ -56,13 +56,13 @@ func gitShowRunner(args []string) error {
 		return fmt.Errorf("running git command %v: %v", cmd, err)
 	}
 
-	return gitDiffOrShowOutput(res, isStatus)
+	return gitDiffOrShowOutput(res, isStatus, opts)
 }
 
 // replace "git status" with "git diff --stat"
-func gitStatusRunner(args []string) error {
+func gitStatusRunner(args []string, opts runnerOptions) error {
 	args = append([]string{"--stat"}, args...)
-	return gitDiffRunner(args)
+	return gitDiffRunner(args, opts)
 }
 
 func mangleGitArgs(args []string) ([]string, bool) {
@@ -79,43 +79,39 @@ func mangleGitArgs(args []string) ([]string, bool) {
 	return newArgs, isStatus
 }
 
-func gitDiffOrShowOutput(res []byte, isStatus bool) error {
+func gitDiffOrShowOutput(res []byte, isStatus bool, opts runnerOptions) error {
 	// Run the output from git through fzf
-	out, err := runFzf(res)
+	outLines, err := runFzf(res, opts)
 	if err != nil {
 		return fmt.Errorf("runFzf: %v", err)
 	}
 
-	// git diff --stat has output like this:
-	//
-	// git diff --stat
-	// gitRunner.go | 26 +++++++++++++++++++++++++++-----
-	// lsRunner.go  |  2 +-
-	// runner.go    |  4 ++++
-	// 3 files changed, 66 insertions(+), 6 deletions(-)
-	//
-	// We want to grab everything from before the pipe
-	if isStatus {
-		path := strings.TrimSpace(strings.Split(out, "|")[0])
-
-		err = openEditor(openEditorArgs{path: path})
-		if err != nil {
-			return fmt.Errorf("running emacsclient for git with --stat: %v", err)
+	var paths []pathArg
+	for _, line := range outLines {
+		// git diff --stat has output like this:
+		//
+		// git diff --stat
+		// gitRunner.go | 26 +++++++++++++++++++++++++++-----
+		// lsRunner.go  |  2 +-
+		// runner.go    |  4 ++++
+		// 3 files changed, 66 insertions(+), 6 deletions(-)
+		//
+		// We want to grab everything from before the pipe
+		if isStatus {
+			path := strings.TrimSpace(strings.Split(line, "|")[0])
+			paths = append(paths, pathArg{path: path})
+		} else {
+			// Get the filename and linenumber from the output
+			output := strings.Split(line, ":")
+			if len(output) < 2 {
+				return fmt.Errorf("expecting a path and a line-number in this git output: %s", output)
+			}
+			paths = append(paths, pathArg{path: output[0], lineNumber: output[1]})
 		}
-
-		return nil
 	}
-
-	// Get the filename and linenumber from the output
-	output := strings.Split(out, ":")
-	if len(output) < 2 {
-		return fmt.Errorf("expecting a path and a line-number in this git output: %s", output)
-	}
-	path := output[0]
-	lineNumber := output[1]
 
 	// Run emacsclient
-	err = openEditor(openEditorArgs{path: path, lineNumber: lineNumber})
+	err = openEditor(paths, opts)
 	if err != nil {
 		return fmt.Errorf("running emacsclient: %v", err)
 	}
