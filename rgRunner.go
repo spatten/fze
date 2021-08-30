@@ -8,7 +8,7 @@ import (
 
 func rgRunner(args []string, opts RunnerOptions) error {
 	// Get the output from rg
-	cmd := "rg -n " + strings.Join(args, " ") // + " | fzf | xargs -n 1 emacsclient -n -s $TMUX_EMACS_DAEMON"
+	cmd := "rg -n " + strings.Join(args, " ")
 	fmt.Printf("Running cmd: %s\n", cmd)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {

@@ -1,7 +1,8 @@
 package fze
 
 type RunnerOptions struct {
-	Multi bool
+	Multi       bool
+	EmacsServer string
 }
 
 type pathArg struct {

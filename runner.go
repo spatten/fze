@@ -48,7 +48,7 @@ func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
 	if !runnerOpts.Multi {
 		cmdArgs = []string{"-n"}
 	}
-	cmdArgs = append(cmdArgs, "-s", os.ExpandEnv("$TMUX_EMACS_DAEMON"))
+	cmdArgs = append(cmdArgs, "-s", runnerOpts.EmacsServer)
 	cmdArgs = append(cmdArgs, pathArgs...)
 	ec := exec.Command("emacsclient", cmdArgs...)
 	fmt.Printf("running command %v\n", ec)
