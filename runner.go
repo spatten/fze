@@ -16,6 +16,8 @@ func Runner(args []string) (string, error) {
 		return findRunner(args[1:])
 	case "rg":
 		return rgRunner(args[1:])
+	case "git":
+		return gitRunner(args[1:])
 	}
 	return "", fmt.Errorf("command %s not recognized", args[0])
 }
@@ -41,7 +43,7 @@ func openEditor(pathArgs []string) error {
 }
 
 func runFzf(input []byte) (string, error) {
-	fzf := exec.Command("fzf", "--tac")
+	fzf := exec.Command("fzf", "--ansi", "--tac")
 	var out bytes.Buffer
 	fzf.Stdin = bytes.NewReader(input)
 	fzf.Stdout = &out
