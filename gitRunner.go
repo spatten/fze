@@ -29,25 +29,10 @@ func gitDiffRunner(args []string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("running git: %v", err)
 	}
+	err = gitDiffOrShowOutput(res)
 
-	// Run the output from git through fzf
-	out, err := runFzf(res)
 	if err != nil {
 		return "", fmt.Errorf("runFzf: %v", err)
-	}
-
-	// Get the filename and linenumber from the output
-	output := strings.Split(out, ":")
-	if len(output) < 2 {
-		return "", fmt.Errorf("expecting a path and a line-number in this git output: %s", output)
-	}
-	path := output[0]
-	lineNumber := output[1]
-
-	// Run emacsclient
-	err = openEditorWithLineNumber(path, lineNumber)
-	if err != nil {
-		return "", fmt.Errorf("running emacsclient: %v", err)
 	}
 
 	return "", nil
@@ -62,16 +47,26 @@ func gitShowRunner(args []string) (string, error) {
 		return "", fmt.Errorf("running git: %v", err)
 	}
 
+	err = gitDiffOrShowOutput(res)
+
+	if err != nil {
+		return "", fmt.Errorf("runFzf: %v", err)
+	}
+
+	return "", nil
+}
+
+func gitDiffOrShowOutput(res []byte) error {
 	// Run the output from git through fzf
 	out, err := runFzf(res)
 	if err != nil {
-		return "", fmt.Errorf("runFzf: %v", err)
+		return fmt.Errorf("runFzf: %v", err)
 	}
 
 	// Get the filename and linenumber from the output
 	output := strings.Split(out, ":")
 	if len(output) < 2 {
-		return "", fmt.Errorf("expecting a path and a line-number in this git output: %s", output)
+		return fmt.Errorf("expecting a path and a line-number in this git output: %s", output)
 	}
 	path := output[0]
 	lineNumber := output[1]
@@ -79,8 +74,8 @@ func gitShowRunner(args []string) (string, error) {
 	// Run emacsclient
 	err = openEditorWithLineNumber(path, lineNumber)
 	if err != nil {
-		return "", fmt.Errorf("running emacsclient: %v", err)
+		return fmt.Errorf("running emacsclient: %v", err)
 	}
 
-	return "", nil
+	return nil
 }
