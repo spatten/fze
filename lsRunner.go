@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func lsRunner(args []string) (string, error) {
+func lsRunner(args []string) error {
 	isLong := false
 	if len(args) > 0 && args[0] == "-l" {
 		isLong = true
@@ -16,13 +16,13 @@ func lsRunner(args []string) (string, error) {
 	cmd := "ls " + strings.Join(args, " ")
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Run the output from ls through fzf
 	path, err := runFzf(res)
 	if err != nil {
-		return "", fmt.Errorf("runFzf: %v", err)
+		return fmt.Errorf("runFzf: %v", err)
 	}
 
 	if isLong {
@@ -35,10 +35,5 @@ func lsRunner(args []string) (string, error) {
 	}
 
 	// Run emacsclient
-	err = openEditorWithoutLineNumber(path)
-	if err != nil {
-		return "", fmt.Errorf("running emacsclient: %v", err)
-	}
-
-	return "", nil
+	return openEditorWithoutLineNumber(path)
 }

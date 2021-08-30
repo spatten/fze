@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func Runner(args []string) (string, error) {
+func Runner(args []string) error {
 	switch cmd := args[0]; cmd {
 	case "ls":
 		return lsRunner(args[1:])
@@ -19,7 +19,7 @@ func Runner(args []string) (string, error) {
 	case "git":
 		return gitRunner(args[1:])
 	}
-	return "", fmt.Errorf("command %s not recognized", args[0])
+	return fmt.Errorf("command %s not recognized", args[0])
 }
 
 func openEditorWithLineNumber(path string, lineNumber string) error {

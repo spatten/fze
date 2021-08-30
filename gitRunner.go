@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-func gitRunner(args []string) (string, error) {
+func gitRunner(args []string) error {
 	if len(args) < 1 {
-		return "", fmt.Errorf("no args to git")
+		return fmt.Errorf("no args to git")
 	}
 
 	switch arg := args[0]; arg {
@@ -18,42 +18,30 @@ func gitRunner(args []string) (string, error) {
 		return gitShowRunner(args[1:])
 	}
 
-	return "", fmt.Errorf("only git diff and git show are supported")
+	return fmt.Errorf("only git diff and git show are supported")
 }
 
-func gitDiffRunner(args []string) (string, error) {
+func gitDiffRunner(args []string) error {
 	// Get the output from git
 	cmd := "git diff --src-prefix=a/ --dst-prefix=b/ --color=always " + strings.Join(args, " ") + " | showlinenum.awk show_path=1"
 	fmt.Printf("Running cmd: %s\n", cmd)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
-		return "", fmt.Errorf("running git: %v", err)
+		return fmt.Errorf("running git: %v", err)
 	}
-	err = gitDiffOrShowOutput(res)
-
-	if err != nil {
-		return "", fmt.Errorf("runFzf: %v", err)
-	}
-
-	return "", nil
+	return gitDiffOrShowOutput(res)
 }
 
-func gitShowRunner(args []string) (string, error) {
+func gitShowRunner(args []string) error {
 	// Get the output from git
 	cmd := "git show --src-prefix=a/ --dst-prefix=b/ --color=always --oneline " + strings.Join(args, " ") + "| tail +2 | showlinenum.awk show_path=1 "
 	fmt.Printf("Running cmd: %s\n", cmd)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
-		return "", fmt.Errorf("running git: %v", err)
+		return fmt.Errorf("running git: %v", err)
 	}
 
-	err = gitDiffOrShowOutput(res)
-
-	if err != nil {
-		return "", fmt.Errorf("runFzf: %v", err)
-	}
-
-	return "", nil
+	return gitDiffOrShowOutput(res)
 }
 
 func gitDiffOrShowOutput(res []byte) error {
