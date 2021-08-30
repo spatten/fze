@@ -8,7 +8,7 @@ import (
 
 func findRunner(args []string, opts runnerOptions) error {
 	// Get the output from find
-	cmd := "find " + strings.Join(args, " ") // + " | fzf | xargs -n 1 emacsclient -n -s $TMUX_EMACS_DAEMON"
+	cmd := "find " + strings.Join(args, " ") // + " | fzf | xargs -n 1 emacsclient -n -s $FZE_EMACS_SERVER"
 	fmt.Printf("Running cmd: %s\n", cmd)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
