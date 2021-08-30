@@ -1,8 +1,9 @@
 package fze
 
 type RunnerOptions struct {
-	Multi       bool
-	EmacsServer string
+	EmacsServer      string
+	Multi            bool
+	SwitchToTmuxPane bool
 }
 
 type pathArg struct {
