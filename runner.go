@@ -9,6 +9,10 @@ import (
 )
 
 func Runner(args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("no args provided")
+	}
+
 	switch cmd := args[0]; cmd {
 	case "ls":
 		return lsRunner(args[1:])

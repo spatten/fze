@@ -30,8 +30,7 @@ func lsRunner(args []string) error {
 		// ls -l output has a variable number of spaces between args. Clean this up by replacing multiple spaces with one space
 		path = re.ReplaceAllString(path, " ")
 		// take 9th column onwards as the path
-		path = strings.SplitAfterN(path, " ", 9)[8]
-		fmt.Printf("path arg: %s\n", path)
+		path = strings.SplitN(path, " ", 9)[8]
 	}
 
 	// Run emacsclient
