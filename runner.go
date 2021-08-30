@@ -10,8 +10,6 @@ import (
 )
 
 func Runner(args []string) (string, error) {
-	fmt.Printf("args: %v\n", args)
-	argString := strings.Join(args, " ")
 	switch cmd := args[0]; cmd {
 	case "ls":
 		return lsRunner(args[1:])
@@ -20,11 +18,7 @@ func Runner(args []string) (string, error) {
 	case "rg":
 		return rgRunner(args[1:])
 	}
-	out, err := exec.Command("bash", "-c", argString).Output()
-	if err != nil {
-		return "", fmt.Errorf("running command %v: %v", args, err)
-	}
-	return string(out), nil
+	return "", fmt.Errorf("command %s not recognized", args[0])
 }
 
 func lsRunner(args []string) (string, error) {
