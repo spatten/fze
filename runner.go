@@ -26,6 +26,8 @@ func Runner(args []string, runnerOpts RunnerOptions) error {
 		return gitRunner(append([]string{"diff"}, args[1:]...), runnerOpts)
 	case "st": // alias for "git status"
 		return gitRunner(append([]string{"status"}, args[1:]...), runnerOpts)
+	case "ll": // alias for "ls -l"
+		return lsRunner(append([]string{"-l"}, args[1:]...), runnerOpts)
 	}
 	return fmt.Errorf("command %s not recognized", args[0])
 }
