@@ -22,10 +22,7 @@ func main() {
 		EmacsServer:      emacsServer,
 		SwitchToTmuxPane: switchToTmuxPane,
 	}
-	// Everything else is an arg
-	args = args[flag.NFlag():]
-
-	err := fze.Runner(args, runnerOpts)
+	err := fze.Runner(flag.Args(), runnerOpts)
 	if err != nil {
 		fmt.Printf("Error! %v\n%v\n", args, err)
 	}

@@ -8,7 +8,7 @@ import (
 
 func rgRunner(args []string, opts RunnerOptions) error {
 	// Get the output from rg
-	cmd := "rg -n " + strings.Join(args, " ")
+	cmd := "rg -n " + fixArgs(args)
 	fmt.Printf("Running cmd: %s\n", cmd)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {

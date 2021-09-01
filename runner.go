@@ -31,6 +31,19 @@ func Runner(args []string, runnerOpts RunnerOptions) error {
 	return fmt.Errorf("command %s not recognized", args[0])
 }
 
+// fixArgs takes each arg, replaces ~ with the contents of $HOME, expands env variables and then
+// wraps it in double-quotes.
+// If then returns all of the fixed args separated by a space
+func fixArgs(args []string) string {
+	fixedArgs := make([]string, 0, len(args))
+	home := os.ExpandEnv("$HOME")
+	for _, arg := range args {
+		fixed := "\"" + os.ExpandEnv(strings.ReplaceAll(arg, "~", home)) + "\""
+		fixedArgs = append(fixedArgs, fixed)
+	}
+	return strings.Join(fixedArgs, " ")
+}
+
 func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
 	var pathArgs []string
 

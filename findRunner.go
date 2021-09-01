@@ -3,12 +3,11 @@ package fze
 import (
 	"fmt"
 	"os/exec"
-	"strings"
 )
 
 func findRunner(args []string, opts RunnerOptions) error {
 	// Get the output from find
-	cmd := "find " + strings.Join(args, " ") // + " | fzf | xargs -n 1 emacsclient -n -s $FZE_EMACS_SERVER"
+	cmd := "find " + fixArgs(args)
 	fmt.Printf("Running cmd: %s\n", cmd)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {

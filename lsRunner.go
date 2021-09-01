@@ -13,7 +13,7 @@ func lsRunner(args []string, opts RunnerOptions) error {
 		isLong = true
 	}
 
-	cmd := "ls " + strings.Join(args, " ")
+	cmd := "ls " + fixArgs(args)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return err

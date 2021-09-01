@@ -28,9 +28,9 @@ func gitDiffRunner(args []string, opts RunnerOptions) error {
 	args, isStatus := mangleGitArgs(args)
 	var cmd string
 	if isStatus {
-		cmd = "git diff --color=always " + strings.Join(args, " ")
+		cmd = "git diff --color=always " + fixArgs(args)
 	} else {
-		cmd = "git diff --src-prefix=a/ --dst-prefix=b/ --color=always " + strings.Join(args, " ") + " | showlinenum.awk show_path=1"
+		cmd = "git diff --src-prefix=a/ --dst-prefix=b/ --color=always " + fixArgs(args) + " | showlinenum.awk show_path=1"
 	}
 
 	res, err := exec.Command("bash", "-c", cmd).Output()
@@ -46,9 +46,9 @@ func gitShowRunner(args []string, opts RunnerOptions) error {
 	args, isStatus := mangleGitArgs(args)
 	var cmd string
 	if isStatus {
-		cmd = "git show --color=always --oneline" + strings.Join(args, " ") + " | tail -n +2"
+		cmd = "git show --color=always --oneline" + fixArgs(args) + " | tail -n +2"
 	} else {
-		cmd = "git show --src-prefix=a/ --dst-prefix=b/ --color=always --oneline " + strings.Join(args, " ") + " | tail -n +2 | showlinenum.awk show_path=1 "
+		cmd = "git show --src-prefix=a/ --dst-prefix=b/ --color=always --oneline " + fixArgs(args) + " | tail -n +2 | showlinenum.awk show_path=1 "
 	}
 
 	res, err := exec.Command("bash", "-c", cmd).Output()
