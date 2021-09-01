@@ -8,7 +8,6 @@ import (
 func findRunner(args []string, opts RunnerOptions) error {
 	// Get the output from find
 	cmd := "find " + fixArgs(args)
-	fmt.Printf("Running cmd: %s\n", cmd)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return fmt.Errorf("running find: %v", err)

@@ -3,7 +3,6 @@ package fze
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -50,13 +49,10 @@ func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
 	// TODO: validate that no paths have a line-number or all paths have a line-number
 	for _, path := range paths {
 		if path.lineNumber != "" {
-			fmt.Printf("line-number is %v\n", path.lineNumber)
 			pathArgs = append(pathArgs, fmt.Sprintf("+%s", path.lineNumber))
 		}
 		pathArgs = append(pathArgs, path.path)
 	}
-	log.Printf("paths: %v (len = %d)\n", paths, len(paths))
-	log.Printf("pathArgs: %v (len = %d)\n", pathArgs, len(pathArgs))
 	var cmdArgs []string
 	if !runnerOpts.Multi {
 		cmdArgs = []string{"-n"}
@@ -64,7 +60,6 @@ func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
 	cmdArgs = append(cmdArgs, "-s", runnerOpts.EmacsServer)
 	cmdArgs = append(cmdArgs, pathArgs...)
 	ec := exec.Command("emacsclient", cmdArgs...)
-	fmt.Printf("running command %v\n", ec)
 	err := ec.Run()
 	if err != nil {
 		return fmt.Errorf("running emacsclient with args: %v, %g", cmdArgs, err)

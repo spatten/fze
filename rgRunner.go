@@ -9,7 +9,6 @@ import (
 func rgRunner(args []string, opts RunnerOptions) error {
 	// Get the output from rg
 	cmd := "rg -n " + fixArgs(args)
-	fmt.Printf("Running cmd: %s\n", cmd)
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return fmt.Errorf("running rg: %v", err)
@@ -20,7 +19,6 @@ func rgRunner(args []string, opts RunnerOptions) error {
 	if err != nil {
 		return fmt.Errorf("runFzf: %v", err)
 	}
-	fmt.Printf("out: %v\n", outLines)
 
 	var paths []pathArg
 	for _, line := range outLines {
