@@ -83,6 +83,12 @@ func runFzf(input []byte, opts RunnerOptions) ([]string, error) {
 	if opts.Multi {
 		fzfArgs = append(fzfArgs, "--multi")
 	}
+
+	// Used for testing. If you pass `--filter foo` to fzf, then it
+	// returns all lines that mach "foo"
+	if opts.TestFilter != "" {
+		fzfArgs = append(fzfArgs, "--filter %s", opts.TestFilter)
+	}
 	fzf := exec.Command("fzf", fzfArgs...)
 	var out bytes.Buffer
 	fzf.Stdin = bytes.NewReader(input)
@@ -94,7 +100,14 @@ func runFzf(input []byte, opts RunnerOptions) ([]string, error) {
 	}
 
 	var lines []string
-	for _, line := range strings.Split(out.String(), "\n") {
+	outLines := strings.Split(out.String(), "\n")
+
+	// For testing -- just return the first match
+	if opts.TestFilter != "" && !opts.Multi {
+		outLines = []string{outLines[0]}
+	}
+
+	for _, line := range outLines {
 		if line != "" {
 			lines = append(lines, strings.TrimSpace(line))
 		}
