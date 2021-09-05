@@ -62,6 +62,11 @@ func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
 	cmdArgs = append(cmdArgs, "-s", runnerOpts.EmacsServer)
 	cmdArgs = append(cmdArgs, pathArgs...)
 	ec := exec.Command("emacsclient", cmdArgs...)
+
+	// Test mode
+	if runnerOpts.TestFilter != "" {
+		return nil
+	}
 	err := ec.Run()
 	if err != nil {
 		return fmt.Errorf("running emacsclient with args: %v, %g", cmdArgs, err)
@@ -84,10 +89,10 @@ func runFzf(input []byte, opts RunnerOptions) ([]string, error) {
 		fzfArgs = append(fzfArgs, "--multi")
 	}
 
-	// Used for testing. If you pass `--filter foo` to fzf, then it
+	// Used for testing. If you pass `--filter=foo` to fzf, then it
 	// returns all lines that mach "foo"
 	if opts.TestFilter != "" {
-		fzfArgs = append(fzfArgs, "--filter %s", opts.TestFilter)
+		fzfArgs = append(fzfArgs, "--filter="+opts.TestFilter)
 	}
 	fzf := exec.Command("fzf", fzfArgs...)
 	var out bytes.Buffer
@@ -96,7 +101,7 @@ func runFzf(input []byte, opts RunnerOptions) ([]string, error) {
 	fzf.Stderr = os.Stderr
 	err := fzf.Run()
 	if err != nil {
-		return nil, fmt.Errorf("starting fzf: %v", err)
+		return nil, fmt.Errorf("starting fzf. input=%v\n Args = %v, err:: %v", string(input), fzfArgs, err)
 	}
 
 	var lines []string
