@@ -90,7 +90,7 @@ func runFzf(input []byte, opts RunnerOptions) ([]string, error) {
 	}
 
 	// Used for testing. If you pass `--filter=foo` to fzf, then it
-	// returns all lines that mach "foo"
+	// returns all lines that match "foo"
 	if opts.TestFilter != "" {
 		fzfArgs = append(fzfArgs, "--filter="+opts.TestFilter)
 	}
