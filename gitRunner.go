@@ -35,7 +35,7 @@ func gitDiffRunner(args []string, opts RunnerOptions) error {
 
 	res, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
-		return fmt.Errorf("running git: %v", err)
+		return fmt.Errorf("running git command \"%s\": %v", cmd, err)
 	}
 
 	return gitDiffOrShowOutput(res, isStatus, opts)
@@ -66,7 +66,7 @@ func gitStatusRunner(args []string, opts RunnerOptions) error {
 }
 
 func mangleGitArgs(args []string) ([]string, bool) {
-	newArgs := make([]string, len(args))
+	newArgs := make([]string, 0, len(args))
 	var isStatus bool
 	for _, arg := range args {
 		if arg == "--stat" || arg == "--numstat" {
