@@ -10,9 +10,8 @@ import (
 
 func Runner(args []string, runnerOpts RunnerOptions) error {
 	if len(args) < 1 {
-		return fmt.Errorf("no args provided")
+		return fzfRunner([]string{}, runnerOpts)
 	}
-
 	switch cmd := args[0]; cmd {
 	case "ls":
 		return lsRunner(args[1:], runnerOpts)
@@ -94,7 +93,8 @@ func runFzf(input []byte, opts RunnerOptions) ([]string, error) {
 	if opts.TestFilter != "" {
 		fzfArgs = append(fzfArgs, "--filter="+opts.TestFilter)
 	}
-	fzf := exec.Command("fzf", fzfArgs...)
+	// fzf := exec.Command("fzf", fzfArgs...)
+	fzf := exec.Command("fzf")
 	var out bytes.Buffer
 	fzf.Stdin = bytes.NewReader(input)
 	fzf.Stdout = &out
