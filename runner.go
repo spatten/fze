@@ -45,21 +45,42 @@ func fixArgs(args []string) string {
 }
 
 func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
-	var pathArgs []string
 
+	editorSetting := os.Getenv("FZE_EDITOR")
+	if editorSetting == "" {
+		editorSetting = "emacsclient"
+	}
+
+	var openEditorErr error
+	switch editorSetting {
+	case "vscode":
+		openEditorErr = openVsCode(paths, runnerOpts)
+	default:
+		openEditorErr = openEmacsClient(paths, runnerOpts)
+	}
+
+	if openEditorErr != nil {
+		return fmt.Errorf("opening editor %s: %v", editorSetting, openEditorErr)
+	}
+
+	return nil
+}
+
+func openEmacsClient(pathArgs []pathArg, runnerOpts RunnerOptions) error {
+	var paths []string
 	// TODO: validate that no paths have a line-number or all paths have a line-number
-	for _, path := range paths {
+	for _, path := range pathArgs {
 		if path.lineNumber != "" {
-			pathArgs = append(pathArgs, fmt.Sprintf("+%s", path.lineNumber))
+			paths = append(paths, fmt.Sprintf("+%s", path.lineNumber))
 		}
-		pathArgs = append(pathArgs, path.path)
+		paths = append(paths, path.path)
 	}
 	var cmdArgs []string
 	if !runnerOpts.Multi {
 		cmdArgs = []string{"-n"}
 	}
 	cmdArgs = append(cmdArgs, "-s", runnerOpts.EmacsServer)
-	cmdArgs = append(cmdArgs, pathArgs...)
+	cmdArgs = append(cmdArgs, paths...)
 	ec := exec.Command("emacsclient", cmdArgs...)
 
 	// Test mode
@@ -77,6 +98,34 @@ func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
 		if err != nil {
 			return fmt.Errorf("switching tmux pane: %v", err)
 		}
+	}
+	return nil
+}
+
+func openVsCode(pathArgs []pathArg, runnerOpts RunnerOptions) error {
+	var paths []string
+	// TODO: validate that no paths have a line-number or all paths have a line-number
+	for _, path := range pathArgs {
+		if path.lineNumber != "" {
+			paths = append(paths, fmt.Sprintf("%s:%s", path.path, path.lineNumber))
+		}
+		paths = append(paths, path.path)
+	}
+	var cmdArgs []string
+	if runnerOpts.Multi {
+		cmdArgs = []string{"--wait"}
+	}
+	cmdArgs = append(cmdArgs, "--goto")
+	cmdArgs = append(cmdArgs, paths...)
+	vsCode := exec.Command("code", cmdArgs...)
+
+	// Test mode
+	if runnerOpts.TestFilter != "" {
+		return nil
+	}
+	err := vsCode.Run()
+	if err != nil {
+		return fmt.Errorf("running emacsclient with args: %v, %g", cmdArgs, err)
 	}
 
 	return nil
