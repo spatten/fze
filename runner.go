@@ -45,7 +45,6 @@ func fixArgs(args []string) string {
 }
 
 func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
-
 	editorSetting := os.Getenv("FZE_EDITOR")
 	if editorSetting == "" {
 		editorSetting = "emacsclient"
@@ -58,7 +57,6 @@ func openEditor(paths []pathArg, runnerOpts RunnerOptions) error {
 	default:
 		openEditorErr = openEmacsClient(paths, runnerOpts)
 	}
-
 	if openEditorErr != nil {
 		return fmt.Errorf("opening editor %s: %v", editorSetting, openEditorErr)
 	}
