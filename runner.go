@@ -140,8 +140,8 @@ func runFzf(input []byte, opts RunnerOptions) ([]string, error) {
 	if opts.TestFilter != "" {
 		fzfArgs = append(fzfArgs, "--filter="+opts.TestFilter)
 	}
-	// fzf := exec.Command("fzf", fzfArgs...)
-	fzf := exec.Command("fzf")
+	fzf := exec.Command("fzf", fzfArgs...)
+	// fzf := exec.Command("fzf")
 	var out bytes.Buffer
 	fzf.Stdin = bytes.NewReader(input)
 	fzf.Stdout = &out
